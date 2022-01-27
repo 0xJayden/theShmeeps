@@ -4,19 +4,26 @@ import Countdown from 'react-countdown'
 import Web3 from 'web3'
 
 // Import Images + CSS
-import logo from '../images/logo.png'
+//import logo from '../images/logo.png'
 import shmeep1 from '../images/4.png'
 import shmeep2 from '../images/134.png'
 import shmeep3 from '../images/9.png'
 import './App.css'
 
 // Import ABI + Config
-import OpenEmoji from '../abis/OpenEmoji.json';
+import OpenEmoji from '../abis/OpenEmoji.json'
+import StakeShmeeps from '../abis/StakeShmeeps.json'
+import ShmeepsToken from '../abis/ShmeepsToken.json'
 import CONFIG from '../config.json';
 
 function App() {
 	const [web3, setWeb3] = useState(null)
 	const [openEmoji, setOpenEmoji] = useState(null)
+	const [stake, setStake] = useState(null)
+	const [token, setToken] = useState(null)
+	const [tokenURIs, setTokenURIs] = useState([])
+	const [tokenIds, setTokenIds] = useState([])
+	const [selectedTokens, setSelectedTokens] = useState([])
 
 	const [supplyAvailable, setSupplyAvailable] = useState(0)
 	const [balanceOf, setBalanceOf] = useState(0)
@@ -44,6 +51,20 @@ function App() {
 				const openEmoji = new web3.eth.Contract(OpenEmoji.abi, OpenEmoji.networks[networkId].address)
 				setOpenEmoji(openEmoji)
 
+				const stake = new web3.eth.Contract(StakeShmeeps.abi, StakeShmeeps.networks[networkId].address)
+				if(!stake) {
+					window.alert("Staking contract not connected to current network!")
+					return
+				}
+				setStake(stake)
+
+				const shmeepsToken = new web3.eth.Contract(ShmeepsToken.abi, ShmeepsToken.networks[networkId].address)
+				if(!stake) {
+					window.alert("Staking contract not connected to current network!")
+					return
+				}
+				setToken(shmeepsToken)
+
 				const maxSupply = await openEmoji.methods.maxSupply().call()
 				const totalSupply = await openEmoji.methods.totalSupply().call()
 				setSupplyAvailable(maxSupply - totalSupply)
@@ -54,6 +75,15 @@ function App() {
 				const allowMintingAfter = await openEmoji.methods.allowMintingAfter().call()
 				const timeDeployed = await openEmoji.methods.timeDeployed().call()
 				setRevealTime((Number(timeDeployed) + Number(allowMintingAfter)).toString() + '000')
+
+				const tokenIds = await openEmoji.methods.walletOfOwner(account).call()
+				setTokenIds(tokenIds)
+				const tokenURIs = []
+				for(let i = 0; i < tokenIds.length; i++) {
+					let tokenURI = await openEmoji.methods.tokenURI(tokenIds[i]).call()
+					tokenURIs.push(tokenURI)
+				}
+				setTokenURIs(tokenURIs)
 
 				if (networkId !== 5777) {
 					setBlockchainExplorerURL(CONFIG.NETWORKS[networkId].blockchainExplorerURL)
@@ -110,7 +140,7 @@ function App() {
 		}
 
 		if (balanceOf > 2) {
-			window.alert('You\'ve already minted 3!')
+			window.alert('You\'ve already minted!')
 			return
 		}
 
@@ -136,6 +166,53 @@ function App() {
 
 		setIsMinting(false)
 	};
+
+	const renderTokenId = (i) => {
+		return(
+			<div className="col text-center">
+				<button onClick={() => {
+					if(!selectedTokens.includes(i)) {
+						selectedTokens.push(i)
+						setSelectedTokens(selectedTokens)
+						console.log(selectedTokens)
+					} else if (selectedTokens.includes(i)) {
+						let index = selectedTokens.indexOf(i)
+						selectedTokens.splice(index, 1)
+						setSelectedTokens(selectedTokens)
+						console.log(selectedTokens)
+					}
+				}}>
+					{i}
+				</button>
+			</div>
+		)
+	}
+
+	const showTokenIds = () => {
+		if(balanceOf > 0) {
+			return(
+				<Row className="my-2">
+					{tokenIds.map(renderTokenId)}
+				</Row>
+			)
+		} else {
+			return(
+				<Row className="my-2 text-center">
+					<p>You don't own any Shmeeps ):</p>
+				</Row>
+			)
+		}
+	}
+
+	const stakeHandler = async () => {
+		if(selectedTokens.length > 0) {
+			console.log("staking...")
+			console.log(stake)
+			await stake.methods.stakeShmeep(selectedTokens)
+		} else {
+			return
+		}
+	}
 
 	useEffect(() => {
 		loadWeb3()
@@ -190,7 +267,7 @@ function App() {
 							) : (
 								shmeep1
 							)}
-							alt="emoji-smile"
+							alt="shmeep-emotions"
 							className="image-showcase-example-1"
 						/>
 					</Col>
@@ -223,6 +300,13 @@ function App() {
 						</div>
 					)}
 				</Row>
+				<Row className="justify-content-center">
+					Shmeeps Available to Stake by ID#
+				</Row>
+				{showTokenIds()}
+				<button className="my-2" onClick={stakeHandler}>Stake</button>
+				<button className="my-2">Claim Tokens</button>
+				<button className="my-2">Claim & Unstake</button>
 			</main>
 		</div>
 	)
