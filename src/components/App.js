@@ -24,6 +24,9 @@ function App() {
 	const [tokenURIs, setTokenURIs] = useState([])
 	const [tokenIds, setTokenIds] = useState([])
 	const [selectedTokens, setSelectedTokens] = useState([])
+	const [selectedStakedTokens, setSelectedStakedTokens] = useState([])
+	const [stakedShmeeps, setStakedShmeeps] = useState([])
+	const [tokenIdsStaked, setTokenIdsStaked] = useState([])
 
 	const [supplyAvailable, setSupplyAvailable] = useState(0)
 	const [balanceOf, setBalanceOf] = useState(0)
@@ -59,7 +62,7 @@ function App() {
 				setStake(stake)
 
 				const shmeepsToken = new web3.eth.Contract(ShmeepsToken.abi, ShmeepsToken.networks[networkId].address)
-				if(!stake) {
+				if(!shmeepsToken) {
 					window.alert("Staking contract not connected to current network!")
 					return
 				}
@@ -71,6 +74,9 @@ function App() {
 
 				const balanceOf = await openEmoji.methods.balanceOf(account).call()
 				setBalanceOf(balanceOf)
+
+				const tokenIdsStaked = await openEmoji.methods.walletOfOwner(StakeShmeeps.networks[networkId].address).call()
+				setTokenIdsStaked(tokenIdsStaked)
 
 				const allowMintingAfter = await openEmoji.methods.allowMintingAfter().call()
 				const timeDeployed = await openEmoji.methods.timeDeployed().call()
@@ -84,6 +90,17 @@ function App() {
 					tokenURIs.push(tokenURI)
 				}
 				setTokenURIs(tokenURIs)
+
+				const stakedShmeepsStream = await stake.getPastEvents('ShmeepStaked', { fromBlock: 10071770, toBlock: 'latest' })
+				const allStakedShmeeps = (stakedShmeepsStream.map(event => event.returnValues))
+
+				for(let i = 0; i < allStakedShmeeps.length; i++) {
+					if(allStakedShmeeps[i].account === account && tokenIdsStaked.includes(allStakedShmeeps[i].tokenId)) {
+						let stakedShmeepId = allStakedShmeeps[i].tokenId
+						stakedShmeeps.push(stakedShmeepId)
+					}
+				}
+				setStakedShmeeps(stakedShmeeps)
 
 				if (networkId !== 5777) {
 					setBlockchainExplorerURL(CONFIG.NETWORKS[networkId].blockchainExplorerURL)
@@ -170,16 +187,37 @@ function App() {
 	const renderTokenId = (i) => {
 		return(
 			<div className="col text-center">
-				<button onClick={() => {
+				<button className="button2" onClick={(e) => {
 					if(!selectedTokens.includes(i)) {
 						selectedTokens.push(i)
 						setSelectedTokens(selectedTokens)
-						console.log(selectedTokens)
+						e.target.className = "button3"
 					} else if (selectedTokens.includes(i)) {
 						let index = selectedTokens.indexOf(i)
 						selectedTokens.splice(index, 1)
 						setSelectedTokens(selectedTokens)
-						console.log(selectedTokens)
+						e.target.className = "button2"
+					}
+				}}>
+					{i}
+				</button>
+			</div>
+		)
+	}
+
+	const renderStakedTokenId = (i) => {
+		return(
+			<div className="col text-center">
+				<button className="button2" onClick={(e) => {
+					if(!selectedStakedTokens.includes(i)) {
+						selectedStakedTokens.push(i)
+						setSelectedStakedTokens(selectedStakedTokens)
+						e.target.className = "button3"
+					} else if (selectedStakedTokens.includes(i)) {
+						let index = selectedStakedTokens.indexOf(i)
+						selectedStakedTokens.splice(index, 1)
+						setSelectedStakedTokens(selectedStakedTokens)
+						e.target.className = "button2"
 					}
 				}}>
 					{i}
@@ -204,15 +242,66 @@ function App() {
 		}
 	}
 
+	const showSelectedIdsToStake = () => {
+		console.log('working...')
+		if(selectedTokens.length > 0) {
+			return(
+				<Row className="my-2">
+					{selectedTokens}
+				</Row>
+			)
+		} else {
+			return(
+				<Row>
+					Nothing selected
+				</Row>
+			)
+		}
+	}
+
+	const displayStakedTokens = () => {
+		if(stakedShmeeps.length > 0) {
+			return(
+				<Row className="my-2">
+					{stakedShmeeps.map(renderStakedTokenId)}
+				</Row>
+			)
+		} else {
+			return(
+				<Row className="my-2 justify-content-center">
+					No Shmeeps Staked.
+				</Row>
+			)
+		}
+	}
+
 	const stakeHandler = async () => {
 		if(selectedTokens.length > 0) {
-			console.log("staking...")
-			console.log(stake)
-			await stake.methods.stakeShmeep(selectedTokens)
+			let stakedShmeeps = await stake.methods.stakeShmeep(selectedTokens).send({ from: account, gas: 1000000 })
 		} else {
 			return
 		}
 	}
+
+	const claimTokensAndUnstake = async () => {
+		if(stakedShmeeps.length > 0) {
+			await stake.methods.claimTokens(selectedStakedTokens, true).send({ from: account, gas: 1000000 })
+		} else {
+			return
+		}
+	}
+
+	const claimTokens = async () => {
+		if(stakedShmeeps.length > 0) {
+			await stake.methods.claimTokens(selectedStakedTokens, false).send({ from: account, gas: 1000000 })
+		} else {
+			return
+		}
+	}
+
+	// const addAdmin = async () => {
+	// 	await token.methods.addAdmin("0x48738F9f9264670E6d6a67005913234bFeff23cc").send({ from: account, gas: 1000000 })
+	// }
 
 	useEffect(() => {
 		loadWeb3()
@@ -221,7 +310,7 @@ function App() {
 
 	return (
 		<div>
-			<nav className="navbar fixed-top mx-3">
+			<nav className="navbar fixed-top">
 				<a
 					className="navbar-brand col-sm-3 col-md-2 mr-0 mx-4"
 					href=""
@@ -278,7 +367,7 @@ function App() {
 						<a href={`${blockchainExplorerURL}address/${account}`} target="_blank" rel="noreferrer" className="button">My Etherscan</a>
 					</Col>
 				</Row>
-				<Row className="my-2 text-center">
+				<Row className="my-2 text-center mb-5">
 					{message ? (
 						<p>{message}</p>
 					) : (
@@ -300,13 +389,31 @@ function App() {
 						</div>
 					)}
 				</Row>
-				<Row className="justify-content-center">
-					Shmeeps Available to Stake by ID#
-				</Row>
-				{showTokenIds()}
-				<button className="my-2" onClick={stakeHandler}>Stake</button>
-				<button className="my-2">Claim Tokens</button>
-				<button className="my-2">Claim & Unstake</button>
+				<div className="staking">
+					<Row className="justify-content-center fs-1 mt-3">
+						STAKING
+					</Row>
+					<Row className="justify-content-center mt-2">
+						Shmeeps Available to Stake by ID#
+					</Row>
+					{showTokenIds()}
+					<Row className="justify-content-center">
+						<button className="button w-50" onClick={stakeHandler}>Stake</button>
+					</Row>
+					<Row className="justify-content-center">
+						Staked Shmeeps by ID#
+					</Row>
+					{displayStakedTokens()}
+					<Row>
+						<Col className="p-0 flex">
+							<button className="button" onClick={claimTokens}>Claim Tokens</button>
+						</Col>
+						<Col className="p-0 flex">
+							<button className="button m-0 p-3" onClick={claimTokensAndUnstake}>Claim & Unstake</button>
+						</Col>
+					</Row>
+					{selectedTokens ? selectedTokens : "hehe"}
+				</div>
 			</main>
 		</div>
 	)
