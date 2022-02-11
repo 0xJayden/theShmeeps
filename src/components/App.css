@@ -1,8 +1,8 @@
 /* Styles go here */
 /* Styles go here */
-@import url('https://fonts.googleapis.com/css2?family=Gluten:wght@400;700&family=Rubik:wght@400;700&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Gluten:wght@400;700&family=Rubik:wght@400;700&display=swap'); */
 
-:root {
+/*:root {
     --clr-prussian-blue: #003853;
     --clr-orient: #006178;
     color: #FFF;
@@ -10,21 +10,21 @@
     --clr-golden-fizz: #FCEA2B;
 
     --clr-button-bg: #92D3F5;
-}
+}*/
 
 html {
-    font-family: "Rubik" !important;
+    font-family: "Helvetica" !important;
     font-weight: 400;
 }
 
 body {
-    background: #73fbe8;
+    background: #001d33;
     /* background: linear-gradient(to top right, hsl(200, 100%, 16%), hsl(200, 100%, 20%)); */
     color: #FFF;
 
     min-height: 100vh;
 
-    font-family: "Rubik";
+    font-family: "Helvetica";
 }
 
 .flex {
@@ -60,48 +60,36 @@ h1 {
     font-family: "Helvetica";
     font-weight: 700;
     font-size: 3rem;
-    text-shadow: -1px 1px 0 #000,
-                  1px 1px 0 #000,
-                  1px -1px 0 #000,
-                 -1px -1px 0 #000;
 }
 
 .countdown {
     font-weight: 700;
     font-size: 2.5rem;
-    text-shadow: -1px 1px 0 #000,
-                  1px 1px 0 #000,
-                  1px -1px 0 #000,
-                 -1px -1px 0 #000;
 }
 
 p {
     font-size: 1.15rem;
-    text-shadow: -0.25px 0.25px 0 #000,
-                  0.25px 0.25px 0 #000,
-                  0.25px -0.25px 0 #000,
-                 -0.25px -0.25px 0 #000;
 }
 
 /* LINK / BUTTON STYLES */
-a, a:hover {
-    color: var(--clr-malibu);
+a {
+    color: #25c8eb;
+}
+
+a:hover {
+    color: #257fa4;
 }
 
 .contract-link {
     text-decoration: none;
     font-weight: 700;
-    text-shadow: -0.25px 0.25px 0 #000,
-                  0.25px 0.25px 0 #000,
-                  0.25px -0.25px 0 #000,
-                 -0.25px -0.25px 0 #000;
 }
 
 .button {
     padding: 1em 2em;
     margin: .5em auto;
 
-    background: #fdfe9e;
+    background: #1a3f6c;
     color: #FFF;
 
     border: none;
@@ -109,11 +97,36 @@ a, a:hover {
     text-transform: uppercase;
     text-decoration: none;
     font-weight: 700;
-    text-shadow: -1px 1px 0 #000,
-                  1px 1px 0 #000,
-                  1px -1px 0 #000,
-                 -1px -1px 0 #000;
+    transition: all 500ms ease;
+}
 
+.button2 {
+    padding: 1em;
+    background: #1a3f6c;
+    color: #FFF;
+
+    border: none;
+
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 500ms ease;
+}
+
+.button3 {
+    padding: 1em;
+    background: #25c8eb;
+    color: #FFF;
+    box-shadow: 0px 0px 10px #257fa4,
+    0px 0px 30px #257fa4,
+    0px 0px 60px #257fa4,
+    0px 0px 100px #257fa4;
+
+    border: none;
+
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 700;
     transition: all 500ms ease;
 }
 
@@ -135,13 +148,11 @@ a, a:hover {
 }
 
 .mint-button:hover, .button:hover {
-    background: var(--clr-malibu);
-    color: var(--clr-prussian-blue);
-
-    box-shadow: 0px 0px 10px var(--clr-malibu),
-    0px 0px 30px var(--clr-malibu),
-    0px 0px 60px var(--clr-malibu),
-    0px 0px 100px var(--clr-malibu);
+    background: #25c8eb;
+    box-shadow: 0px 0px 10px #257fa4,
+    0px 0px 30px #257fa4,
+    0px 0px 60px #257fa4,
+    0px 0px 100px #257fa4;
 }
 
 .mint-button::before {
@@ -162,12 +173,12 @@ a, a:hover {
     content: '';
     position: absolute;
     inset: 4px;
-    background: #fdfe9e;
+    background: #1a3f6c;
     transition: 0.5s;
 }
 
-.mint-button:hover::after {
-    background: var(--clr-malibu);
+.mint-button:hover::after, .button:hover::after {
+    background: #257fa4;
 }
 
 .mint-button span {
@@ -204,12 +215,19 @@ a, a:hover {
     max-width: 250px;
     height: auto;
 
-    border: .75em solid #fdfe9e;
+    border: .75em solid #1a3f6c;
 }
 
 .navbar {
+    background: #1c1c1c;
+    padding: 0;
+    margin: 0;
     text-shadow: -0.5px 0.5px 0 #000,
                   0.5px 0.5px 0 #000,
                   0.5px -0.5px 0 #000,
                  -0.5px -0.5px 0 #000;
+}
+
+.staking {
+    background: #1c1c1c;
 }
