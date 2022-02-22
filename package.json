@@ -1,8 +1,8 @@
 {
-  "name": "eth-marketplace",
+  "name": "The-Shmeeps",
   "version": "0.1.0",
-  "description": "An Ethereum Marketplace",
-  "author": "gregory@dappuniversity.com",
+  "description": "A Mockup NFT Project",
+  "author": "jaydendavila@live.com",
   "dependencies": {
     "@openzeppelin/contracts": "^4.3.2",
     "@testing-library/jest-dom": "^5.14.1",
