@@ -25,8 +25,8 @@ https://the-shmeeps.herokuapp.com/
 2. Install Truffle globally  
 `npm i -g truffle`  
 
-3. Install Ganache globally  
-`npm i -g ganache`  
+3. Install Ganache CLI globally  
+`npm i -g ganache-cli`  
 
 4. Download or clone this repository (you may need to install git if cloning using the command line interface - `npm i -g git`)  
 `git clone https://github.com/0xJayden/theShmeeps.git`  
