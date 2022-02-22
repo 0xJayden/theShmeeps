@@ -50,4 +50,6 @@ e.g. `cd desktop/theShmeeps`
 
 5. Launch the DApp `npm start` and connect the imported account from MetaMask to the site.  
 
-If you'd like to launch on a test network like Rinkeby, replace development in step 4 with your preffered network (rinkeby and matic are already available in truffle-config.js, if you want to deploy on a different network, then add it in module.exports under networks in truffle-config.js before you migrate)
+If you'd like to launch on a test network like Rinkeby, replace development in step 4 with your preffered network (rinkeby and matic are already available in truffle-config.js, if you want to deploy on a different network, then add it in module.exports under networks in truffle-config.js before you migrate)  
+
+You'll be able to mint NFT's, but staking will be unavailable, unless you also deploy the token contract and the staking contract on the same network. Where you can get the token repository and the staking repository.
