@@ -39,17 +39,14 @@ e.g. `cd desktop/theShmeeps`
 
 <strong>How To Use</strong>  
 
-1. Open ganache and click the Quickstart button.  
+1. Create an account on https://alchemy.com, then create a new app and fill out the required fields. Make sure that the Chain is Ethereum and the Network is Rinkeby.  
 
-2. Make sure you have MetaMask installed https://metamask.io and connect to a network that matches the network ganache is using (Shows towards the top of Ganache, usually the RPC URL being HTTP://127.0.0.1:7545 and the NETWORK ID being 5777) and the port matches in truffle-config.js.  
+2. View the details of your newly created app, click view key and copy the HTTP or Websockets key.  
 
-3. Import an account from Ganache to your MetaMask.  
+3. Run a local blockchain by forking the Ethereum Rinkeby test network using Ganache CLI with the copied key from your app in Alchemy in a separate CLI window or tab  
+`ganache-cli -f pasteKeyHere`  
 
-4. Deploy the contracts to the development network, which is called development, in truffle-config.js   
-`truffle migrate --network development`  
+4. Make sure you have MetaMask installed https://metamask.io, import one of the given accounts from the local blockchain by copy pasting that account's private key in your MetaMask and connect to network LocalHost 8545.  
 
-5. Launch the DApp `npm start` and connect the imported account from MetaMask to the site.  
-
-If you'd like to launch on a test network like Rinkeby, replace development in step 4 with your preffered network (rinkeby and matic are already available in truffle-config.js, if you want to deploy on a different network, then add it in module.exports under networks in truffle-config.js before you migrate)  
-
-You'll be able to mint NFT's, but staking will be unavailable, unless you also deploy the token contract and the staking contract on the same network. Where you can get the token repository and the staking repository.
+5. Run the DApp in the previous CLI window where you are in the project directory  
+`npm start`  
