@@ -334,7 +334,7 @@ function App() {
 				)}
 			</nav>
 			<main>
-				<Row className="my-3">
+				<Row className="start my-3">
 					<Col className="text-center">
 						<h1 className="text-uppercase">The Shmeeps</h1>
 						<p className="countdown">
