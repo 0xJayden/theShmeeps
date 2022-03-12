@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import axios from 'axios'
 import { Row, Col } from 'react-bootstrap'
 import Countdown from 'react-countdown'
 import Web3 from 'web3'
@@ -14,19 +15,22 @@ import './App.css'
 import OpenEmoji from '../abis/OpenEmoji.json'
 import StakeShmeeps from '../abis/StakeShmeeps.json'
 import ShmeepsToken from '../abis/ShmeepsToken.json'
-import CONFIG from '../config.json';
+import CONFIG from '../config.json'
 
 function App() {
 	const [web3, setWeb3] = useState(null)
 	const [openEmoji, setOpenEmoji] = useState(null)
 	const [stake, setStake] = useState(null)
-	const [token, setToken] = useState(null)
-	const [tokenURIs, setTokenURIs] = useState([])
 	const [tokenIds, setTokenIds] = useState([])
 	const [selectedTokens, setSelectedTokens] = useState([])
 	const [selectedStakedTokens, setSelectedStakedTokens] = useState([])
 	const [stakedShmeeps, setStakedShmeeps] = useState([])
 	const [tokenIdsStaked, setTokenIdsStaked] = useState([])
+	const [availableImageUrls, setAvailableImageUrls] = useState([])
+	const [stakedImageUrls, setStakedImageUrls] = useState([])
+	const [urlTl, setUrlTl] = useState(``)
+	const [amount, setAmount] = useState(0)
+	const [totalAmountStaked, setTotalAmountStaked] = useState(0)
 
 	const [supplyAvailable, setSupplyAvailable] = useState(0)
 	const [balanceOf, setBalanceOf] = useState(0)
@@ -51,9 +55,12 @@ function App() {
 			setCurrentNetwork(networkId)
 
 			try {
+
+				// Nft contract
 				const openEmoji = new web3.eth.Contract(OpenEmoji.abi, OpenEmoji.networks[networkId].address)
 				setOpenEmoji(openEmoji)
 
+				// Staking contract
 				const stake = new web3.eth.Contract(StakeShmeeps.abi, StakeShmeeps.networks[networkId].address)
 				if(!stake) {
 					window.alert("Staking contract not connected to current network!")
@@ -61,36 +68,36 @@ function App() {
 				}
 				setStake(stake)
 
+				// Token contract
 				const shmeepsToken = new web3.eth.Contract(ShmeepsToken.abi, ShmeepsToken.networks[networkId].address)
 				if(!shmeepsToken) {
 					window.alert("Staking contract not connected to current network!")
 					return
 				}
-				setToken(shmeepsToken)
 
+				// Load available supply
 				const maxSupply = await openEmoji.methods.maxSupply().call()
 				const totalSupply = await openEmoji.methods.totalSupply().call()
 				setSupplyAvailable(maxSupply - totalSupply)
 
+				// Balance of Nfts in account
 				const balanceOf = await openEmoji.methods.balanceOf(account).call()
 				setBalanceOf(balanceOf)
 
+				// Load staked nfts on stakimg contract
 				const tokenIdsStaked = await openEmoji.methods.walletOfOwner(StakeShmeeps.networks[networkId].address).call()
 				setTokenIdsStaked(tokenIdsStaked)
 
+				// Set reveal time
 				const allowMintingAfter = await openEmoji.methods.allowMintingAfter().call()
 				const timeDeployed = await openEmoji.methods.timeDeployed().call()
 				setRevealTime((Number(timeDeployed) + Number(allowMintingAfter)).toString() + '000')
 
+				// Fetch nfts available to stake
 				const tokenIds = await openEmoji.methods.walletOfOwner(account).call()
 				setTokenIds(tokenIds)
-				const tokenURIs = []
-				for(let i = 0; i < tokenIds.length; i++) {
-					let tokenURI = await openEmoji.methods.tokenURI(tokenIds[i]).call()
-					tokenURIs.push(tokenURI)
-				}
-				setTokenURIs(tokenURIs)
 
+				// Fetch staked nfts
 				const stakedShmeepsStream = await stake.getPastEvents('ShmeepStaked', { fromBlock: 10071770, toBlock: 'latest' })
 				const allStakedShmeeps = (stakedShmeepsStream.map(event => event.returnValues))
 
@@ -101,6 +108,39 @@ function App() {
 					}
 				}
 				setStakedShmeeps(stakedShmeeps)
+
+				// Available nfts and staked nfts in one array, iterate over array to create the template literal for the api url
+				const images = [...tokenIds, ...stakedShmeeps]
+				if (images.length === 1) {
+					let urlTl = `token_ids=${images[0]}&`
+					setUrlTl(urlTl)
+				} else if (images.length > 1) {
+					let urlTl = `token_ids=${images[0]}&`
+					for (let i = 1; images.length > i; i++) {
+						urlTl = urlTl + `token_ids=${images[i]}&`
+					}
+					setUrlTl(urlTl)
+				} else {
+					return
+				}
+
+				// Fetch api for nfts in owners wallet and in staking contract
+				const result = await axios.get(
+		        `https://testnets-api.opensea.io/api/v1/assets?${urlTl}asset_contract_address=0x8CE171d997d8a818D6c1437a39F344A74b068ADc&order_direction=desc&offset=0&limit=20`)
+		        const assets = result.data.assets
+
+		        // Put nft image urls in wallet in own array and staked nfts in another.
+		        for (let i = 0; assets.length > i; i++) {
+		        	if (tokenIds.includes(assets[i].token_id)) {
+		        		availableImageUrls.push(assets[i].image_url)
+		        	} else if (stakedShmeeps.includes(assets[i].token_id)) {
+		        		stakedImageUrls.push(assets[i].image_url)
+		        	}
+		        }
+		        setAvailableImageUrls(availableImageUrls)
+		        setStakedImageUrls(stakedImageUrls)
+		        const amountStaked = stakedImageUrls.length
+		        setTotalAmountStaked(amountStaked)
 
 				if (networkId !== 5777) {
 					setBlockchainExplorerURL(CONFIG.NETWORKS[networkId].blockchainExplorerURL)
@@ -156,8 +196,13 @@ function App() {
 			return
 		}
 
-		if (balanceOf > 2) {
+		if (balanceOf + totalAmountStaked > 2) {
 			window.alert('You\'ve already minted!')
+			return
+		}
+
+		if (amount === 0) {
+			window.alert('Please select an amount.')
 			return
 		}
 
@@ -166,7 +211,7 @@ function App() {
 			setIsMinting(true)
 			setIsError(false)
 
-			await openEmoji.methods.mint(1).send({ from: account, value: 0 })
+			await openEmoji.methods.mint(amount).send({ from: account, value: 0 })
 				.on('confirmation', async () => {
 					const maxSupply = await openEmoji.methods.maxSupply().call()
 					const totalSupply = await openEmoji.methods.totalSupply().call()
@@ -184,9 +229,10 @@ function App() {
 		setIsMinting(false)
 	};
 
+	// Render available nfts to stake.
 	const renderTokenId = (i) => {
 		return(
-			<div className="col text-center">
+			<div className="col text-center" key={i}>
 				<button className="button2" onClick={(e) => {
 					if(!selectedTokens.includes(i)) {
 						selectedTokens.push(i)
@@ -199,15 +245,16 @@ function App() {
 						e.target.className = "button2"
 					}
 				}}>
-					{i}
+					<img className="nft" alt="available nft to stake" src={i}/>
 				</button>
 			</div>
 		)
 	}
 
+	// Render staked nfts
 	const renderStakedTokenId = (i) => {
 		return(
-			<div className="col text-center">
+			<div className="col text-center" key={i}>
 				<button className="button2" onClick={(e) => {
 					if(!selectedStakedTokens.includes(i)) {
 						selectedStakedTokens.push(i)
@@ -220,17 +267,18 @@ function App() {
 						e.target.className = "button2"
 					}
 				}}>
-					{i}
+					<img className="nft" alt="staked nft" src={i}/>
 				</button>
 			</div>
 		)
 	}
 
+	// Map nfts available to stake to render
 	const showTokenIds = () => {
 		if(balanceOf > 0) {
 			return(
-				<Row className="my-2">
-					{tokenIds.map(renderTokenId)}
+				<Row className="available-row my-2">
+					{availableImageUrls.map(renderTokenId)}
 				</Row>
 			)
 		} else {
@@ -242,28 +290,12 @@ function App() {
 		}
 	}
 
-	const showSelectedIdsToStake = () => {
-		console.log('working...')
-		if(selectedTokens.length > 0) {
-			return(
-				<Row className="my-2">
-					{selectedTokens}
-				</Row>
-			)
-		} else {
-			return(
-				<Row>
-					Nothing selected
-				</Row>
-			)
-		}
-	}
-
+	// Map staked nfts to render
 	const displayStakedTokens = () => {
 		if(stakedShmeeps.length > 0) {
 			return(
 				<Row className="my-2">
-					{stakedShmeeps.map(renderStakedTokenId)}
+					{stakedImageUrls.map(renderStakedTokenId)}
 				</Row>
 			)
 		} else {
@@ -275,14 +307,19 @@ function App() {
 		}
 	}
 
+	// Stake selected nfts
 	const stakeHandler = async () => {
 		if(selectedTokens.length > 0) {
-			let stakedShmeeps = await stake.methods.stakeShmeep(selectedTokens).send({ from: account, gas: 1000000 })
+			await stake.methods.stakeShmeep(selectedTokens).send({ from: account, gas: 1000000 })
+			const amountStaked = selectedTokens.length
+			totalAmountStaked += amountStaked
+			setTotalAmountStaked(amountStaked)
 		} else {
 			return
 		}
 	}
 
+	// Claim tokens and unstake nfts
 	const claimTokensAndUnstake = async () => {
 		if(stakedShmeeps.length > 0) {
 			await stake.methods.claimTokens(selectedStakedTokens, true).send({ from: account, gas: 1000000 })
@@ -291,6 +328,7 @@ function App() {
 		}
 	}
 
+	// Claim tokens without unstaking
 	const claimTokens = async () => {
 		if(stakedShmeeps.length > 0) {
 			await stake.methods.claimTokens(selectedStakedTokens, false).send({ from: account, gas: 1000000 })
@@ -299,11 +337,12 @@ function App() {
 		}
 	}
 
-	// const addAdmin = async () => {
-	// 	await token.methods.addAdmin("0x48738F9f9264670E6d6a67005913234bFeff23cc").send({ from: account, gas: 1000000 })
-	// }
+	const handleAmount = (e) => {
+		const amount = e.target.value
+		setAmount(amount)
+	}
 
-	useEffect(() => {
+	useEffect( () => {
 		loadWeb3()
 		loadBlockchainData()
 	}, [account]);
@@ -313,7 +352,7 @@ function App() {
 			<nav className="navbar fixed-top">
 				<a
 					className="navbar-brand col-sm-3 col-md-2 mr-0 mx-4"
-					href=""
+					href="/#"
 					target="_blank"
 					rel="noopener noreferrer"
 				>
@@ -343,9 +382,10 @@ function App() {
 						<p>Mint your free Shmeep (not including gas fees)</p>
 					</Col>
 				</Row>
-				<Row className="my-4">
+				<Row className="showcase my-4">
 					<Col className="panel grid" sm={12} md={6}>
 						<button onClick={mintNFTHandler} className="button mint-button"><span>Mint</span></button>
+						<input type='text' placeholder='Amount' onChange={handleAmount} className='input' />
 					</Col>
 					<Col className="panel grid image-showcase mx-4">
 						<img
@@ -390,29 +430,28 @@ function App() {
 					)}
 				</Row>
 				<div className="staking">
-					<Row className="justify-content-center fs-1 mt-3">
+					<Row className="staking-row justify-content-center mt-3">
 						STAKING
 					</Row>
-					<Row className="justify-content-center mt-2">
-						Shmeeps Available to Stake by ID#
+					<Row className="justify-content-center mt-2 mb-4">
+						Select Shmeeps to Stake
 					</Row>
 					{showTokenIds()}
-					<Row className="justify-content-center">
+					<Row className="justify-content-center mb-5">
 						<button className="button w-50" onClick={stakeHandler}>Stake</button>
 					</Row>
-					<Row className="justify-content-center">
-						Staked Shmeeps by ID#
+					<Row className="justify-content-center mb-4">
+						Select Staked Shmeeps
 					</Row>
 					{displayStakedTokens()}
-					<Row>
+					<Row className="mb-3">
 						<Col className="p-0 flex">
 							<button className="button" onClick={claimTokens}>Claim Tokens</button>
 						</Col>
 						<Col className="p-0 flex">
-							<button className="button m-0 p-3" onClick={claimTokensAndUnstake}>Claim & Unstake</button>
+							<button className="button" onClick={claimTokensAndUnstake}>Claim & Unstake</button>
 						</Col>
 					</Row>
-					{selectedTokens ? selectedTokens : "hehe"}
 				</div>
 			</main>
 		</div>

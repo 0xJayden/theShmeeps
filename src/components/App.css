@@ -1,30 +1,14 @@
-/* Styles go here */
-/* Styles go here */
-/* @import url('https://fonts.googleapis.com/css2?family=Gluten:wght@400;700&family=Rubik:wght@400;700&display=swap'); */
-
-/*:root {
-    --clr-prussian-blue: #003853;
-    --clr-orient: #006178;
-    color: #FFF;
-
-    --clr-golden-fizz: #FCEA2B;
-
-    --clr-button-bg: #92D3F5;
-}*/
-
 html {
-    font-family: "Helvetica" !important;
     font-weight: 400;
+    font-family: "Gill Sans";
+
 }
 
 body {
-    background: #001d33;
-    /* background: linear-gradient(to top right, hsl(200, 100%, 16%), hsl(200, 100%, 20%)); */
-    color: #FFF;
+    background: #abe4ff;
+    color: #333333;
 
     min-height: 100vh;
-
-    font-family: "Helvetica";
 }
 
 .flex {
@@ -55,11 +39,15 @@ main {
     position: relative;
 }
 
-/* TEXT STYLES */
 h1 {
-    font-family: "Helvetica";
     font-weight: 700;
-    font-size: 3rem;
+    color: #ffffff;
+    font-size: 5rem;
+    text-shadow: 0 10px 25px #000000,
+    0 0 1px #000000,
+    0 0 1px #000000,
+    0 0 1px #000000;
+
 }
 
 .countdown {
@@ -71,13 +59,13 @@ p {
     font-size: 1.15rem;
 }
 
-/* LINK / BUTTON STYLES */
+/*links*/
 a {
-    color: #25c8eb;
+    color: #333333;
 }
 
 a:hover {
-    color: #257fa4;
+    color: #333333;
 }
 
 .contract-link {
@@ -85,49 +73,55 @@ a:hover {
     font-weight: 700;
 }
 
+/*buttons*/
 .button {
     padding: 1em 2em;
     margin: .5em auto;
 
-    background: #1a3f6c;
-    color: #FFF;
+    background: #fefeab;
+    color: #333333;
 
-    border: none;
+    border-radius: 50px;
+    border: 2px solid #4a7fa4;
 
     text-transform: uppercase;
     text-decoration: none;
-    font-weight: 700;
+    font-weight: 500;
     transition: all 500ms ease;
 }
 
 .button2 {
-    padding: 1em;
-    background: #1a3f6c;
-    color: #FFF;
-
     border: none;
-
-    text-transform: uppercase;
-    text-decoration: none;
-    font-weight: 700;
     transition: all 500ms ease;
+    background: transparent;
 }
 
 .button3 {
-    padding: 1em;
-    background: #25c8eb;
-    color: #FFF;
+    border: none;
     box-shadow: 0px 0px 10px #257fa4,
     0px 0px 30px #257fa4,
     0px 0px 60px #257fa4,
     0px 0px 100px #257fa4;
-
-    border: none;
-
-    text-transform: uppercase;
-    text-decoration: none;
-    font-weight: 700;
     transition: all 500ms ease;
+    background: transparent;
+}
+
+.button2 img {
+    overflow: hidden;
+    padding: 0;
+    border-radius: 10px;
+    border: 2px solid #4a7fa4;
+    width: 100px;
+    height: 100px;
+}
+
+.button3 img {
+    overflow: hidden;
+    padding: 0;
+    border-radius: 10px;
+    border: 2px solid #4a7fa4;
+    width: 100px;
+    height: 100px;
 }
 
 .nav-button {
@@ -148,53 +142,41 @@ a:hover {
 }
 
 .mint-button:hover, .button:hover {
-    background: #25c8eb;
+    background: #ffffff;
     box-shadow: 0px 0px 10px #257fa4,
     0px 0px 30px #257fa4,
     0px 0px 60px #257fa4,
     0px 0px 100px #257fa4;
 }
 
-.mint-button::before {
-    content: '';
-    position: absolute;
-    width: 40px;
-    height: 400%;
-    background: #FFF;
-    transition: 1s;
-    animation: animate 2s linear infinite;
-}
-
-.mint-button:hover::before {
-    width: 100%;
-}
+/*.mint-button:hover::after, .button:hover::after {
+    background: #cfefff;
+}*/
 
 .mint-button::after {
     content: '';
+    display: block;
     position: absolute;
-    inset: 4px;
-    background: #1a3f6c;
-    transition: 0.5s;
-}
-
-.mint-button:hover::after, .button:hover::after {
-    background: #257fa4;
+    background: rgba(255, 255, 255, 1);
+    width: 30px;
+    height: 100%;
+    top: 0;
+    filter: blur(10px);
+    transform: translateX(-200px) skewX(-15deg);
+    animation-name: shine;
+    animation-iteration-count: infinite;
+    animation-duration: 2s;
 }
 
 .mint-button span {
     z-index: 1;
 }
 
-@keyframes animate {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+@keyframes shine {
+  100% { transform: translateX(300px) skewX(-15deg);}
 }
 
-/* IMAGE STYLES */
+/*images*/
 .App-logo {
     max-width: 30px;
     height: auto;
@@ -202,8 +184,10 @@ a:hover {
 }
 
 .image-showcase {
-    width: 250px;
+    width: 350px;
     height: 250px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .image-showcase img {
@@ -215,25 +199,100 @@ a:hover {
     max-width: 250px;
     height: auto;
 
-    border: .75em solid #1a3f6c;
+    border: .25em solid #4a7fa4;
+    border-radius: 50px;
+}
+
+.showcase {
+    border-radius: 50px;
+    box-shadow: 
+    0px 10px 15px #777777;
 }
 
 .navbar {
-    background: #1c1c1c;
     padding: 0;
     margin: 0;
-    text-shadow: -0.5px 0.5px 0 #000,
-                  0.5px 0.5px 0 #000,
-                  0.5px -0.5px 0 #000,
-                 -0.5px -0.5px 0 #000;
 }
 
-@media (max-width: 400px) {
-    .start {
-        padding-top: 50px;
-    }
+.showcase {
+    background-color: #cfefff;
+}
+
+.staking-row {
+    color: #ffffff;
+    font-size: 5rem;
+    font-weight: 600;
+    text-shadow: 0 0 2px #000000,
+    0 0 1px #000000,
+    0 0 1px #000000,
+    0 0 1px #000000;
+    margin-bottom: 20px;
 }
 
 .staking {
-    background: #1c1c1c;
+    background-color: #cfefff;
+    border-radius: 50px;
+    box-shadow: 
+    0px 10px 15px #777777;
+}
+
+.input {
+    text-align: center;
+    margin-top: 20px;
+}
+
+@media only screen and (max-width: 450px) {
+    .start {
+        padding-top: 20px;
+    }
+
+    .button {
+        max-width: 150px;
+        font-size: .75rem;
+        text-align: center;
+        padding: 10px;
+    }
+
+    .image-showcase {
+        margin: 0;
+        padding: 0;
+        max-width: 250px;
+    }
+
+    .image-showcase img {
+        width: 200px;
+    }
+
+    .showcase {
+        justify-content: center;
+        width: auto;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    body {
+        font-weight: 500;
+    }
+
+    p {
+        font-size: 1rem;
+    }
+
+    a {
+        font-size: .75rem;
+    }
+
+    .navbar a {
+        font-size: 1rem;
+    }
+
+    .staking {
+        width: auto;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    .staking-row {
+        font-size: 3rem;
+    }
 }
