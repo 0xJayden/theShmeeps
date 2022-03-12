@@ -5,10 +5,10 @@
   "author": "jaydendavila@live.com",
   "dependencies": {
     "@openzeppelin/contracts": "^4.5.0",
-    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/jest-dom": "^5.16.2",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
-    "@truffle/hdwallet-provider": "^1.5.1",
+    "@truffle/hdwallet-provider": "^1.7.0",
     "ajv": "^8.10.0",
     "ansi-html": "0.0.9",
     "api": "^4.2.0",
@@ -20,9 +20,10 @@
     "babel-preset-stage-3": "^6.24.1",
     "babel-register": "^6.26.0",
     "bootstrap": "^5.1.1",
-    "chai": "^4.3.4",
+    "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "chai-bignumber": "^3.0.0",
+    "cross-fetch": "^3.1.5",
     "dotenv": "^10.0.0",
     "follow-redirects": "^1.14.9",
     "lodash": "^4.17.21",
@@ -36,10 +37,10 @@
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
     "simple-get": "^4.0.1",
-    "truffle": "^5.4.13",
+    "truffle": "^5.5.4",
     "url-parse": "^1.5.10",
     "web-vitals": "^1.1.2",
-    "web3": "^1.6.0"
+    "web3": "^1.7.1"
   },
   "scripts": {
     "start": "react-scripts start",
