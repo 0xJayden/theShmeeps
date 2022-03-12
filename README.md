@@ -4,7 +4,7 @@ Mock-up NFT project with the ability to stake and earn tokens.
 
 <strong>Website</strong>  
 
-https://the-shmeeps.herokuapp.com/  
+https://theshmeeps.surge.sh/  
 
 <strong>How To Use</strong>  
 
