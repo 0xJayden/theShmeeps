@@ -1,4 +1,4 @@
-# theShmeeps  
+# The Shmeeps  
 
 Mock-up NFT project with the ability to stake and earn tokens.  
 
